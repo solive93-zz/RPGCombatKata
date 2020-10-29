@@ -30,8 +30,32 @@ final class CharacterTest extends TestCase
         $healing_value = 500;
         $character1 = new Character();
         $character2 = new Character();
+        $character1->health = 200; 
         $character2->heal($character1, $healing_value);
-        $this->assertTrue($character1->health > 500);
+        $this->assertEquals($character1->health, 700);
+    }
 
+    public function test_iteration_character_dead()
+    {
+        $healing_value = 500;
+        $character1 = new Character();
+        $character2 = new Character();
+        $character1->status = false; 
+        $character1->health = 0;
+        $character2->heal($character1, $healing_value);
+        $this->assertEquals($character1->health, 0);
+        $this->assertEquals($character1->status, false);
+        
+    }
+
+    public function test_iteration_character_healing()
+    {
+        $healing_value = 110;
+        $character1 = new Character();
+        $character2 = new Character(); 
+        $character1->health = 900;
+        $character2->heal($character1, $healing_value);
+        $this->assertEquals($character1->health, 1000);
+        
     }
 }

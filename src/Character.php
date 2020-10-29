@@ -17,4 +17,18 @@ final class Character
 
     }
 
+    public function heal($character, $healing_value)
+    {
+        if($character->status == false || $character->health == 0 || $character->health == 1000)
+        {
+          return $character;
+        }
+
+        $character->health += $healing_value;
+        if ($character->health > 1000)
+        {
+          $character->health = 1000;
+        }
+    }
+
 }
