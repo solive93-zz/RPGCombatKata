@@ -12,7 +12,7 @@ final class CharacterTest extends TestCase
         $this->assertTrue($character->status);
     }
 
-    public function test_iteration_1_2()
+    public function test_can_deal_damage_to_others()
     {
         $damage_value = 600;
         $character1 = new Character();
@@ -22,17 +22,6 @@ final class CharacterTest extends TestCase
         $character2->attack($character1, $damage_value);
         $this->assertEquals(0, $character1->health);
         $this->assertFalse($character1->status);
-
-    }
-
-    public function test_iteration_1_3()
-    {
-        $healing_value = 500;
-        $character1 = new Character();
-        $character2 = new Character();
-        $character1->health = 200; 
-        $character2->heal($character1, $healing_value);
-        $this->assertEquals($character1->health, 700);
     }
 
     public function test_iteration_character_dead()
@@ -44,18 +33,36 @@ final class CharacterTest extends TestCase
         $character1->health = 0;
         $character2->heal($character1, $healing_value);
         $this->assertEquals($character1->health, 0);
-        $this->assertEquals($character1->status, false);
-        
+        $this->assertEquals($character1->status, false);  
     }
 
-    public function test_iteration_character_healing()
+    public function test_iteration_character_cannot_heal_above_1000()
+    {
+        $healing_value = 110;
+        $character1 = new Character(); 
+        $character1->health = 900;
+        $character1->heal($character1, $healing_value);
+        $this->assertEquals($character1->health, 1000);   
+    }
+
+    public function test_iteration_2_cant_attack_itself()
+    {
+        $damage_value = 600;
+        $character = new Character();
+        $character->attack($character, $damage_value);
+        $this->assertEquals(1000, $character->health);  
+    }
+
+    public function test_iteration_2_can_only_heal_itself()
     {
         $healing_value = 110;
         $character1 = new Character();
-        $character2 = new Character(); 
-        $character1->health = 900;
-        $character2->heal($character1, $healing_value);
-        $this->assertEquals($character1->health, 1000);
-        
+        $character2 = new Character();
+        $character1->health = 800;
+        $character2->health = 800;
+        $character1->heal($character1, $healing_value);
+        $this->assertEquals($character1->health, 910);
+        $character1->heal($character2, $healing_value);
+        $this->assertEquals($character2->health, 800);   
     }
 }
