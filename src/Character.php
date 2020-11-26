@@ -15,16 +15,19 @@ final class Character
         echo "You cannot attack yourself"; 
         return;
       }
-      $levelDifference = abs($character->level - $this->level);
-      //var_dump($levelDifference);
-      if ($levelDifference < 5)
+      if ($character->level == $this->level)
       {
-
         $character->health -= $damage_value;
-        
-        //var_dump($character->health);
       }
-      if ($levelDifference >= 5)
+
+      $levelDifference = abs($character->level - $this->level);
+      
+      if ($levelDifference < 5 && $this->level > $character->level)
+      {
+        $damage_value = $damage_value + ($damage_value / 2);  
+        $character->health = $character->health - $damage_value;
+      }
+      if ($levelDifference >= 5 )
       {
         $character->health -= ($damage_value / 2);
       }
