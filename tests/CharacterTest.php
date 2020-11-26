@@ -65,4 +65,26 @@ final class CharacterTest extends TestCase
         $character1->heal($character2, $healing_value);
         $this->assertEquals($character2->health, 800);   
     }
+
+    public function test_iteration_2_damage_reduced_by_50percent_LevelDifference_5_Or_More()
+    {
+        $damage_value = 200;
+        $character1 = new Character();
+        $character2 = new Character();
+        $character1->level = 6;
+        $character2->level = 1;
+        $character2->attack($character1, $damage_value);
+        $this->assertEquals($character1->health, 900);  
+    }
+
+    /*public function test_iteration_2_damage_increased_by_50percent_LevelDifference_less_than_5()
+    {
+        $damage_value = 200;
+        $character1 = new Character();
+        $character2 = new Character();
+        $character1->level = 2;
+        $character2->level = 6;
+        $character2->attack($character1, $damage_value);
+        $this->assertEquals($character1->health, 700);  
+    }*/
 }

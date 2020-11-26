@@ -8,14 +8,27 @@ final class Character
     public $status = true;
 
 
-    public function attack($character, $damage)
+    public function attack($character, $damage_value)
     {
       if ($character === $this)
       {
         echo "You cannot attack yourself"; 
         return;
       }
-      $character->health -= $damage;
+      $levelDifference = abs($character->level - $this->level);
+      //var_dump($levelDifference);
+      if ($levelDifference < 5)
+      {
+
+        $character->health -= $damage_value;
+        
+        //var_dump($character->health);
+      }
+      if ($levelDifference >= 5)
+      {
+        $character->health -= ($damage_value / 2);
+      }
+
       if($character->health <= 0)
         {
           $character->die();
