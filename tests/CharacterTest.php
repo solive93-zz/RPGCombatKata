@@ -4,58 +4,98 @@ use App\Character;
 
 final class CharacterTest extends TestCase
 {
-    public function test_characters_should_have_initial_level_status()
+    public function test_character_has_health1000_level1_and_statusAlive_when_created()
     {
         $character = new Character();
-        $this->assertEquals(1000, $character->health);
-        $this->assertEquals(1, $character->level);
-        $this->assertTrue($character->status);
+
+        $this->assertEquals(1000, $character->getHealth());
+        $this->assertEquals(1, $character->getLevel());
+        $this->assertEquals('alive', $character->getStatus());
     }
 
-    public function test_iteration_1_2()
+    public function test_character_can_deal_damage_to_characters()
     {
-        $damage_value = 600;
         $character1 = new Character();
-        $character2 = new Character();
-        $character2->attack($character1, $damage_value);
-        $this->assertEquals(1000 - $damage_value, $character1->health);
-        $character2->attack($character1, $damage_value);
-        $this->assertEquals(0, $character1->health);
-        $this->assertFalse($character1->status);
+        $character2 = new Character(999, 1, 'alive');
 
+        $damage = $character1->attack($character2);
+
+        $this->assertEquals(999-$damage, $character2->getHealth());
     }
 
-    public function test_iteration_1_3()
+    public function test_character_dies()
     {
-        $healing_value = 500;
         $character1 = new Character();
-        $character2 = new Character();
-        $character1->health = 200; 
-        $character2->heal($character1, $healing_value);
-        $this->assertEquals($character1->health, 700);
+        $character2 = new Character(1, 1, 'alive');
+
+        $character1->attack($character2);
+
+        $this->assertEquals('dead', $character2->getStatus());
+        $this->assertEquals(0, $character2->getHealth());
     }
 
-    public function test_iteration_character_dead()
+    public function test_character_can_only_heal_himself()
     {
-        $healing_value = 500;
-        $character1 = new Character();
-        $character2 = new Character();
-        $character1->status = false; 
-        $character1->health = 0;
-        $character2->heal($character1, $healing_value);
-        $this->assertEquals($character1->health, 0);
-        $this->assertEquals($character1->status, false);
+        $currentHealth = 10;
+
+        $character = new Character($currentHealth, 1, 'alive');
+
+        $healingPoints = $character->heal();
+
+        $this->assertEquals($currentHealth + $healingPoints, $character->getHealth());
+    }
+
+    public function test_dead_characters_cannot_be_healed()
+    {
+        $currentHealth = 0;
         
+        $character1 = new Character();
+        $character2 = new Character($currentHealth, 1, 'dead');
+
+        $character1->heal($character2);
+
+        $this->assertEquals(0, $character2->getHealth());
+        $this->assertEquals('dead', $character2->getStatus());
     }
 
-    public function test_iteration_character_healing()
+    public function test_healing_cannot_raise_health_above_1000()
     {
-        $healing_value = 110;
-        $character1 = new Character();
-        $character2 = new Character(); 
-        $character1->health = 900;
-        $character2->heal($character1, $healing_value);
-        $this->assertEquals($character1->health, 1000);
+        $currentHealth = 1000;
         
+        $character1 = new Character();
+        $character2 = new Character($currentHealth, 1, 'alive');
+
+        $character1->heal($character2);
+
+        $this->assertEquals(1000, $character2->getHealth());
+    }
+
+    public function  test_character_cannot_deal_damage_to_itself()
+    {       
+        $character = new Character();
+
+        $result = $character->attack($character);
+
+        $this->assertEquals(1000, $character->getHealth());
+    }
+
+    public function test_damage_is_reduced_50pc_when_target_is_5plus_levels_above()
+    {
+        $attacker = new Character();
+        $target = new Character(1000, 6, 'alive');
+
+        $damage = $attacker->attack($target);
+
+        $this->assertEquals(1000 - round($damage/2), $target->getHealth());
+    }
+
+    public function test_damage_is_increased_50pc_when_target_is_5plus_levels_below()
+    {
+        $target = new Character();
+        $attacker = new Character(1000, 6, 'alive');
+
+        $damage = $attacker->attack($target);
+
+        $this->assertEquals(1000 - round($damage*2), $target->getHealth());
     }
 }

@@ -3,32 +3,89 @@ namespace App;
 
 final class Character
 {
-    public $health = 1000;
-    public $level = 1;
-    public $status = true;
+    const MAX_HEALTH = 1000;
+    const CANNOT_ATTACK_YOURSELF = 'You cannot attack yourself!';
 
-    public function attack($character, $damage)
+    private $health;
+    private $level;
+    private $status;
+
+    public function __construct($health = 1000, $level = 1, $status = 'alive')
     {
-        $character->health -= $damage;
-        if($character->health <= 0){
-            $character->health = 0;
-            $character->status = false;
-        }
-
+        $this->health = $health;
+        $this->level = $level;
+        $this->status = $status;
     }
 
-    public function heal($character, $healing_value)
+    public function getHealth()
     {
-        if($character->status == false || $character->health == 0 || $character->health == 1000)
-        {
-          return $character;
-        }
-
-        $character->health += $healing_value;
-        if ($character->health > 1000)
-        {
-          $character->health = 1000;
-        }
+        return $this->health;
+    }
+    
+    public function getLevel()
+    {
+        return $this->level;
+    }
+    
+    public function getStatus()
+    {
+        return $this->status;
     }
 
+    public function attack(Character $character)
+    {
+        $damage = random_int(1, 100);
+
+        if($character == $this)
+        {
+            return self::CANNOT_ATTACK_YOURSELF;
+        }
+
+        if($character->health - $damage < 0)
+        {
+            return $character->die();
+        }
+        
+        if(($this->level - $character->level) <= -5)
+        {
+            $character->health -= round($damage/2);
+            return $damage;        
+        }
+        if(($this->level - $character->level) >= 5)
+        {
+            $character->health -= round($damage*2);
+            return $damage; 
+        }
+        $character->health -= $damage;        
+        return $damage;
+    }
+
+    private function die()
+    {
+        $this->health = 0;
+        $this->status = 'dead';
+    }
+
+    public function heal() 
+    {
+        $heal = random_int(1, 100);
+
+        if($this->isDead() || $this->hasFullHealth())
+        {
+            return $heal;
+        }
+        $this->health += $heal;
+
+        return $heal;
+    }
+
+    private function isDead() :bool
+    {
+        return $this->health <= 0 || $this->status == 'dead';
+    }
+
+    private function hasFullHealth() :bool
+    {
+        return $this->health == self::MAX_HEALTH;
+    }
 }
