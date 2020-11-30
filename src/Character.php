@@ -34,9 +34,15 @@ final class Character
 
     public function attack(Character $character)
     {
-        $damage = random_int(1, 100);
+        $damage = Damage::random();
+        $this->dealDamage($character, $damage);
+                
+        return $damage;
+    }
 
-        if($character == $this)
+    private function dealDamage(Character $character, int $damage)
+    {
+        if($character->isItself($this))
         {
             return self::CANNOT_ATTACK_YOURSELF;
         }
@@ -46,18 +52,27 @@ final class Character
             return $character->die();
         }
         
-        if(($this->level - $character->level) <= -5)
+        if($this->is5OrMoreLevelsAbove($character))
         {
             $character->health -= round($damage/2);
             return $damage;        
         }
-        if(($this->level - $character->level) >= 5)
+        if($character->is5OrMoreLevelsAbove($this))
         {
             $character->health -= round($damage*2);
             return $damage; 
         }
-        $character->health -= $damage;        
-        return $damage;
+        $character->health -= $damage;
+    }
+
+    private function isItself($character) :bool
+    {
+        return $character == $this;
+    }
+
+    private function is5OrMoreLevelsAbove(Character $character) :bool
+    {
+        return ($this->level - $character->level) <= -5;
     }
 
     private function die()
