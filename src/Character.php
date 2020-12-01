@@ -1,6 +1,8 @@
 <?php
 namespace App;
 
+use App\Damage;
+
 final class Character
 {
     const MAX_HEALTH = 1000;
@@ -34,30 +36,32 @@ final class Character
 
     public function attack(Character $character)
     {
-        $damage = Damage::random();
-        $this->dealDamage($character, $damage);
+        $damage = new Damage();
+
+        $this->dealDamage($character, $damage->amount());
                 
-        return $damage;
+        return $damage->amount();
     }
 
-    private function dealDamage(Character $character, int $damage)
+    private function dealDamage(Character $character, $damage)
     {
-        if($character->isItself($this))
+        if($character->is_itself($this))
         {
             return self::CANNOT_ATTACK_YOURSELF;
         }
 
-        if($character->health - $damage < 0)
+        if($character->healthIsBelow0($damage))
         {
             return $character->die();
         }
         
-        if($this->is5OrMoreLevelsAbove($character))
+        if($this->is5OrMoreLevelsBelow($character))
         {
             $character->health -= round($damage/2);
             return $damage;        
         }
-        if($character->is5OrMoreLevelsAbove($this))
+        
+        if($character->is5OrMoreLevelsBelow($this))
         {
             $character->health -= round($damage*2);
             return $damage; 
@@ -65,12 +69,17 @@ final class Character
         $character->health -= $damage;
     }
 
-    private function isItself($character) :bool
+    private function is_itself(Character $character) :bool
     {
         return $character == $this;
     }
 
-    private function is5OrMoreLevelsAbove(Character $character) :bool
+    private function healthIsBelow0($damage) :bool
+    {
+        return $this->health - $damage < 0;
+    }
+
+    public function is5OrMoreLevelsBelow(Character $character) :bool
     {
         return ($this->level - $character->level) <= -5;
     }

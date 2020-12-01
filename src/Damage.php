@@ -5,9 +5,17 @@ final class Damage
 {
     const MIN_DAMAGE = 1;
     const MAX_DAMAGE = 100;
+    
+    private $amount;
 
-    public static function random()
+    public function __construct()
     {
-        return random_int(1, 100);
+        $this->amount = random_int(self::MIN_DAMAGE, self::MAX_DAMAGE);
     }
+
+    public function amount()
+    {
+        return $this->amount;
+    }
+    
 }
